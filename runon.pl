@@ -1,5 +1,4 @@
 #!/usr/bin/env perl
-# rep https://gist.github.com/z448/45024574e7724c2d5847
 
 use JSON;
 
@@ -65,3 +64,6 @@ sub help {
           runon bata          list all AMER Batman servers
           runon bataq         same as above but only QA environment
           runon bataq0        list first hostname from list above (AMER QA Batman - first server on the list)
+
+=head REPOSITORY
+            rep https://gist.github.com/z448/45024574e7724c2d5847
