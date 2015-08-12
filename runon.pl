@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+# for updates see source at https://gist.github.com/z448/45024574e7724c2d5847
 
 use JSON;
 use Data::Dumper;
