@@ -14,7 +14,7 @@ my (@envapps, @regapps, @appname);
 my $argL = length($arg);
 $arg =~ s/(...)(.)?(.)?(.)?/$1$2$3$4/;
 my ($app, $reg, $env, $host) = ($1,$2,$3,$4);
-my $fn = "$ENV{'HOME'}/etc/.apps.json";
+my $fn = "$ENV{'HOME'}\/nps\/etc\/\.apps\.json";
 my $jdata;
 {
         open(my $fh, '<:encoding(UTF-8)', $fn) or die;
@@ -58,7 +58,7 @@ sub help {
            HOST_Nr - from 0 to 9
        - path ($2) is path to script which will be executed on remote hosts
 =head1 EXAMPLES
-	      runon bat           list all Batman servers
+              runon bat           list all Batman servers
           runon bata          list all AMER Batman servers
           runon bataq         same as above but only QA environment
           runon bataq0        list first hostname from list above (AMER QA Batman - first server on the list)
