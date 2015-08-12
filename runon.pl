@@ -1,5 +1,30 @@
 #!/usr/bin/env perl
 
+use JSON;
+use Data::Dumper;
+$json = JSON->new->allow_nonref;
+my $arg;
+if ($ARGV[0]) {
+    $arg = uc($ARGV[0]);
+}
+if ($ARGV[0] eq '-h') {
+    &help; exit;
+} else { print "$nicej"; }
+my (@envapps, @regapps, @appname);
+my $argL = length($arg);
+$arg =~ s/(...)(.)?(.)?(.)?/$1$2$3$4/;
+my ($app, $reg, $env, $host) = ($1,$2,$3,$4);
+my $fn = "$ENV{'HOME'}\/nps\/etc\/\.apps\.json";
+my $jdata;
+{
+        open(my $fh, '<:encoding(UTF-8)', $fn) or die;
+        local $/ = undef;
+        $jdata = <$fh>;
+        close $fh;
+}
+$pdata = $json->decode( $jdata );
+$nicej = $json->pretty->encode( $pdata );
+if ($argL >= 3) {
     @appname = grep { $_->{'application'} =~ /^$app.*/ } @$pdata;
     } if ($argL >= 4) {
             @regapps = grep { $_->{'region'} =~ /$reg.../ } @appname;
