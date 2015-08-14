@@ -46,6 +46,7 @@ sub status {
 }
 
 if ($ARGV[1] eq '-s') { &status }
+if ($ARGV[1] eq '-t') {&todo} 
 
 if ($argL==0) { system(&help) }
 sub help {
@@ -54,6 +55,12 @@ sub help {
     print "\n\ \ \ \ \ \ \ [r] - first character of region; e.g: amer = a";
     print "\n\ \ \ \ \ \ \ [e] - first character of enviroment e.g: sit = s\n";
     print "\n";
+}
+
+sub todo {
+    print "- if first option ends with number, then the number is item in array which i'll use as additional filter for whatever preceeds the nubmer";
+    print "- get rid of JSON dependency or use JSON::Lite";
+    print "- add option to source custom file on another side, right upon login";
 }
 
 =head1 NAME
