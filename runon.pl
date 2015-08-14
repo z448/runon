@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-
 # rep https://gist.github.com/z448/45024574e7724c2d5847
+# git clone https://gist.github.com/45024574e7724c2d5847.git
 
 use JSON;
 
