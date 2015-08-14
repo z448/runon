@@ -45,8 +45,9 @@ sub status {
     }
 }
 
-if ($ARGV[1] eq '-s') { &status }
+if ($ARGV[1] eq '-s') {&status}
 if ($ARGV[1] eq '-t') {&todo} 
+if ($ARGV[1] eq '-u') {&update}
 
 if ($argL==0) { system(&help) }
 sub help {
@@ -61,6 +62,12 @@ sub todo {
     print "- if first option ends with number, then the number is item in array which i'll use as additional filter for whatever preceeds the nubmer";
     print "- get rid of JSON dependency or use JSON::Lite";
     print "- add option to source custom file on another side, right upon login";
+}
+
+sub update {
+    $mepath = `which $@`;
+    system("rm -r $@");
+    system("git clone https://gist.github.com/45024574e7724c2d5847.git");
 }
 
 =head1 NAME
