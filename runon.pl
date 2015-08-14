@@ -33,8 +33,8 @@ if ($argL >= 3) {
             @envapps = grep { $_->{'env'} =~ /$env.?/ } @regapps;
         }
 if ($argL==3) {foreach (@appname){ print "$_->{'application'}\ \> \ $_->{'hostname'}\n"; status(\@appname)}};
-if ($argL==4) {foreach (@regapps){ print "$_->{'application'}\ \> \ $_->{'region'}\ \>\ $_->{'hostname'}\n" }};
-if ($argL==5) {foreach (@envapps){ print "$_->{'application'}\ \> \ $_->{'region'}\ \>\ $_->{'env'}\ \>\  $_->{'hostname'}\n" }};
+if ($argL==4) {foreach (@regapps){ print "$_->{'application'}\ \> \ $_->{'region'}\ \>\ $_->{'hostname'}\n"; status(\@regapps)}};
+if ($argL==5) {foreach (@envapps){ print "$_->{'application'}\ \> \ $_->{'region'}\ \>\ $_->{'env'}\ \>\  $_->{'hostname'}\n"; status(\@envapps)}};
 if ($argL==6) {for ($envapps[$host]){ system("ssh $_->{'username'}\@$_->{'hostname'}\n") }};
 
 sub status {
