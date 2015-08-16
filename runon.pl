@@ -51,11 +51,11 @@ if ($ARGV[1] eq '-u') {&update}
 
 if ($argL==0) { system(&help) }
 sub help {
-    print "QUICK HELP\n(use 'perldoc runon' for more detailed help)\n\n";
-    print "\ \ \ usage: runon [app][r][e]\n\ \ \ \ \ \ \ [app] - first 3 characters of application name; e.g: Puma = pum";
-    print "\n\ \ \ \ \ \ \ [r] - first character of region; e.g: amer = a";
-    print "\n\ \ \ \ \ \ \ [e] - first character of enviroment e.g: sit = s\n";
-    print "\n";
+    print "\nQUICK HELP\n(use 'perldoc runon' for help in more detail)\n\n";
+    print "\tusage:\trunon [app][r][e]\n\n\t\t[app]\tfirst 3 characters of application name; e.g: Puma = pum";
+    print "\n\t\t[r]\tfirst character of region; e.g: amer = a";
+    print "\n\t\t[e]\tfirst character of enviroment e.g: sit = s";
+    print "\n\n";
 }
 
 sub todo {
