@@ -3,6 +3,7 @@
 # git clone https://gist.github.com/45024574e7724c2d5847.git
 
 use JSON;
+use Net::OpenSSH;
 
 $json = JSON->new->allow_nonref;
 my $arg;
@@ -49,8 +50,19 @@ if (defined $ARGV[1]) {
 if ($ARGV[1] eq '-s') {&status}
 elsif ($ARGV[1] eq '-t') {&todo}
 elsif ($ARGV[1] eq '-u') {&update}
-else {for ($envapps[$host]){ system("sshrc $_->{'username'}\@$_->{'hostname'} \"nohup $ARGV[1] > /dev/null & && exit\"\n") }
+#else {for ($envapps[$host]){ system("sshrc $_->{'username'}\@$_->{'hostname'} \'source ~/nps/bin/nps.env && $ARGV[1]\'\n") }
+else {for ($envapps[$host]){ ossh($_->{'username'}, $_->{'hostname'}, $ARGV[1]) }
         }
+}
+
+sub ossh {
+        my $user = shift;
+        my $target = shift;
+        my $cmd = shift;
+        my $ssh = Net::OpenSSH->new("$user\@$target");
+        #$ssh->system("export PATH=\$HOME/nps/bin"); # works
+        my @rcvr = $ssh->capture("export PATH=~/nps/bin:\$PATH; $cmd");
+        print @rcvr;
 }
 
 if ($argL==0) { system(&h) }
