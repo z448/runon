@@ -63,6 +63,8 @@ sub ossh {
         #$ssh->system("export PATH=\$HOME/nps/bin"); # works
         my @rcvr = $ssh->capture("export PATH=~/nps/bin:\$PATH; $cmd");
         print @rcvr;
+#implement 'find w follow symlinks'
+# runon batas 'find -L ~ -iname "*.log"'
 }
 
 if ($argL==0) { system(&h) }
