@@ -10,7 +10,7 @@ if ($ARGV[0]) {
     $arg = uc($ARGV[0]);
 }
 if ($ARGV[0] eq '-h') {
-    &help; exit;
+    &h; exit;
 } else { print "$nicej"; }
 my (@envapps, @regapps, @appname);
 my $argL = length($arg);
@@ -45,13 +45,22 @@ sub status {
     }
 }
 
+if (defined $ARGV[1]) {
 if ($ARGV[1] eq '-s') {&status}
-if ($ARGV[1] eq '-t') {&todo} 
-if ($ARGV[1] eq '-u') {&update}
+elsif ($ARGV[1] eq '-t') {&todo}
+elsif ($ARGV[1] eq '-u') {&update}
+else {for ($envapps[$host]){ system("sshrc $_->{'username'}\@$_->{'hostname'} \"nohup $ARGV[1] > /dev/null & && exit\"\n") }
+        }
+}
 
-if ($argL==0) { system(&help) }
+if ($argL==0) { system(&h) }
+
 sub help {
-    print "\nQUICK HELP\n(use 'perldoc runon' for help in more detail)\n\n";
+        system("perldoc $0");
+}
+
+sub h {
+    print "\nQUICK HELP\n(use --help for help in more detail)\n\n";
     print "\tusage:\trunon [app][r][e]\n\n\t\t[app]\tfirst 3 characters of application name; e.g: Puma = pum";
     print "\n\t\t[r]\tfirst character of region; e.g: amer = a";
     print "\n\t\t[e]\tfirst character of enviroment e.g: sit = s";
@@ -67,7 +76,7 @@ sub todo {
 sub update {
     $mepath = `which $0`;
     system("rm -r .git");
-    system("curl -kLO https://gist.githubusercontent.com/z448/45024574e7724c2d5847/raw/0ac9dbf6a3b16bb96d02f988df638fbacb5a0592/runon.pl");
+    system("curl -kLO `cat .runon`");
 }
 
 =head1 NAME
