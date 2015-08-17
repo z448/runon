@@ -65,9 +65,9 @@ sub todo {
 }
 
 sub update {
-    $mepath = `which $@`;
-    system("rm -r $@");
-    system("git clone https://gist.github.com/45024574e7724c2d5847.git");
+    $mepath = `which $0`;
+    system("rm -r .git");
+    system("curl -kLO https://gist.githubusercontent.com/z448/45024574e7724c2d5847/raw/0ac9dbf6a3b16bb96d02f988df638fbacb5a0592/runon.pl");
 }
 
 =head1 NAME
