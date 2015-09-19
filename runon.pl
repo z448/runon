@@ -89,7 +89,7 @@ sub ossh {
 
 sub conn {
         my $data = shift;
-        for (@$data) {system qq(ssh -q $_->{'username'}\@$_->{'hostname'})}
+        for ($$data[0]) {system qq(sshrcc-q $_->{'username'}\@$_->{'hostname'})}
         #for (@$data) {system(qq(ssh "$_->{'username'}"@"$_->{'hostname'}"))}
 }
 
