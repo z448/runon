@@ -11,9 +11,6 @@ my $arg;
 if ($ARGV[0]) {
     $arg = uc($ARGV[0]);
 }
-if ($ARGV[0] eq '-h') {
-    &h; exit;
-} else { print "$nicej"; }
 my (@envapps, @regapps, @appname);
 my $argL = length($arg);
 $arg =~ s/(...)(.)?(.)?(.)?/$1$2$3$4/;
@@ -31,57 +28,72 @@ my $jdata;
         $jdata = <$fh>;
         close $fh;
 }
+
 $pdata = $json->decode( $jdata );
 $nicej = $json->pretty->encode( $pdata );
-if ($argL >= 3) {
-    @appname = grep { $_->{'application'} =~m/$app.*/ } @$pdata;
-    } if ($argL >= 4) {
-            @regapps = grep { $_->{'region'} =~m/$reg.../ } @appname;
-        } if ($argL >= 5) {
-            @envapps = grep { $_->{'env'} =~ /$env../ } @regapps;
-        }
-if ($argL==3) {foreach (@appname){ print "$_->{'application'}\ \> \ $_->{'hostname'}\n"; status(\@appname)}};
-if ($argL==4) {foreach (@regapps){ ossh($_, $ARGV[1])}};
-if ($argL==5) {foreach (@envapps){ ossh($_, $ARGV[1])}};
-        #print "$_->{'application'}\ \> \ $_->{'region'}\ \>\ $_->{'env'}\ \>\  $_->{'hostname'}\n"; status(\@envapps)}};
 
-if ($argL==6) {
-            foreach (@envapps) {
-                ossh($_, $ARGV[1]) ;
-            } 
+sub chopL {
+    if ($argL >= 3) {@data = grep { $_->{'application'} =~m/^${app}.*?/ } @$pdata}
+    if ($argL >= 4) {@data= grep { $_->{'region'} =~m/^${reg}.../ } @data}
+    if ($argL >= 5) {@data = grep { $_->{'env'} =~ m/^${env}/ } @data}
+    relay(\@data);
+   }
+
+#relay action based on parameters
+sub relay {
+    my $data = shift;
+    if ( !defined $ARGV[1]) {
+        #one arg sub goes here
+        if ($argL==3) {printer(\@$data)}
+        if ($argL==4) {printer(\@$data)}
+        if ($argL==5) {printer(\@$data)}
+        if ($argL==6) {conn(\@$data)}
+        } else {
+            #two arg sub goes here
+            if ($ARGV[1] eq '-s') {
+                status(\@$data)
+            } else {
+                ossh(\@$data, $ARGV[1]);
+            }
+        }
+    }
+    
+sub printer {
+    my $reel = shift;
+    for (@$reel) {
+        print "$_->{'application'}\ \> \ $_->{'hostname'}\n";
+        #print "$_->{'application'}\ \> \ $_->{'region'}\ \>\ $_->{'env'}\ \>\  $_->{'hostname'}\n"; status(\@envapps)}};
+    }
 }
 
 sub status {
-    foreach (@$range){ 
+    my $data = shift;
+    for (@$data){ 
         print "$_->{'application'}\ \n \ $_->{'status'}\n";
         }
     }
 
-if (defined $ARGV[1]) {
-if ($ARGV[1] eq '-s') {&status}
-elsif ($ARGV[1] eq '-t') {&todo}
-elsif ($ARGV[1] eq '-u') {&update}
-#else {for ($envapps[$host]){ system("sshrc $_->{'username'}\@$_->{'hostname'} \'source ~/nps/bin/nps.env && $ARGV[1]\'\n") }
-} 
-
-#else {
-#ossh("$_->{'username'}", "$_->{'hostname'}", "$ARGV[1]"); 
-#}
-
 sub ossh {
-        my $t_ = shift;
+        my $data = shift;
         my $cmd = shift;
-        my $t=qq($t_->{'username'}\@$t_->{'hostname'});
-        #my $target=$t_-{
-        my $ssh = Net::OpenSSH->new($t);
-        #my @pty = $ssh->system("source /etc/profile && export PATH=\$HOME/nps/bin && $cmd"); # works
-        my @pty = $ssh->capture({stdin_discard => 1},"export PATH=~/nps/bin:\$PATH; echo `hostname`; $cmd");
-        print @pty;
-#implement 'find w follow symlinks'
-# runon batas 'find -L ~ -iname "*.log"'
+        for (@$data) {
+            my $con = qq($_->{'username'}\@$_->{'hostname'});
+            my $ssh = Net::OpenSSH->new($con);
+            #my @pty = $ssh->system("source /etc/profile && export PATH=\$HOME/nps/bin && $cmd"); # works
+            my @pty = $ssh->capture({stdin_discard => 1},"export PATH=~/nps/bin:\$PATH; echo `hostname`; $cmd");
+            print @pty;
+        }
+        #implement 'find w follow symlinks'
+        # runon batas 'find -L ~ -iname "*.log"'
 }
 
-if ($argL==0) { system(&h) }
+sub conn {
+        my $data = shift;
+        for (@$data) {system qq(ssh -q $_->{'username'}\@$_->{'hostname'})}
+        #for (@$data) {system(qq(ssh "$_->{'username'}"@"$_->{'hostname'}"))}
+}
+
+&chopL;
 
 sub help {
         system("perldoc $0");
