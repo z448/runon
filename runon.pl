@@ -44,10 +44,10 @@ sub relay {
     if ( !defined $ARGV[1]) {
         # minus arg0 subs goes here
         if ($ARGV[0]=~m/^\-/) {
-            if ($ARGV[0] eq '--help') {&help}
-            if ($ARGV[0] eq '-h') {&h} 
-            return;
+            if ($ARGV[0] eq '--help' or $ARGV[0] eq '-h') {&help}
         } 
+        #quick help if no arg passed
+        unless(defined $ARGV[0]) {&h}
         #one arg subs goes here
         if ($argL>2 and $argL<6) {printer(\@$data, $argL)}
         if ($argL==6) {conn(\@$data)}
@@ -102,6 +102,7 @@ sub conn {
         for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
 }
 
+##################### start ###################
 &chopL;
 
 sub help {
@@ -109,7 +110,9 @@ sub help {
 }
 
 sub h {
-    print "\nQUICK HELP\n(use --help for help in more detail)\n\n";
+    print "\nQUICK HELP\nuse ";
+    print colored(['bright_white on_black'],"--help");
+    print " for help in more detail)\n\n";
     print "\tusage:\trunon [app][r][e]\n\n\t\t[app]\tfirst 3 characters of application name; e.g: Puma = pum";
     print "\n\t\t[r]\tfirst character of region; e.g: amer = a";
     print "\n\t\t[e]\tfirst character of enviroment e.g: sit = s";
