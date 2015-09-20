@@ -5,20 +5,15 @@
 use JSON;
 use Net::OpenSSH;
 use Term::ANSIColor;
+use feature 'say';
 
 $json = JSON->new->allow_nonref;
 my $arg;
-if ($ARGV[0]) {
-    $arg = uc($ARGV[0]);
-}
-my (@envapps, @regapps, @appname);
+if ($ARGV[0]) {$arg = uc($ARGV[0])}
+
 my $argL = length($arg);
 $arg =~ s/(...)(.)?(.)?(.)?/$1$2$3$4/;
-#my ($app, $reg, $env, $host) = ($1,$2,$3,$4);
-my $app=qr/$1/;
-my $reg=qr/$2/;
-my $env=qr/$3/;
-my $host=qr/$4/;
+my ($app, $reg, $env, $host) = (qr/$1/,qr/$2/,qr/$3/,qr/$4/);
 
 my $fn = "$ENV{'HOME'}\/nps\/etc\/\.apps\.json";
 my $jdata;
@@ -29,13 +24,17 @@ my $jdata;
         close $fh;
 }
 
-$pdata = $json->decode( $jdata );
-$nicej = $json->pretty->encode( $pdata );
+$pdata = $json->decode($jdata);
+sub jane {
+    say $json->pretty->encode($pdata);
+}
 
+#fiter first param
 sub chopL {
+    #&help and last unless ( defined $ARGV[0]);
     if ($argL >= 3) {@data = grep { $_->{'application'} =~m/^${app}.*?/ } @$pdata}
     if ($argL >= 4) {@data= grep { $_->{'region'} =~m/^${reg}.../ } @data}
-    if ($argL >= 5) {@data = grep { $_->{'env'} =~ m/^${env}/ } @data}
+    if ($argL >= 5) {@data = grep { $_->{'env'} =~ m/^${env}.?.?/ } @data}
     relay(\@data);
    }
 
@@ -43,20 +42,23 @@ sub chopL {
 sub relay {
     my $data = shift;
     if ( !defined $ARGV[1]) {
-        #one arg sub goes here
-        if ($argL==3) {printer(\@$data)}
-        if ($argL==4) {printer(\@$data)}
-        if ($argL==5) {printer(\@$data)}
+        # minus arg0 subs goes here
+        if ($ARGV[0]=~m/^\-/) {
+            if ($ARGV[0] eq '--help') {&help}
+            if ($ARGV[0] eq '-h') {&h} 
+            return;
+        } 
+        #one arg subs goes here
+        if ($argL>2 and $argL<6) {printer(\@$data)}
         if ($argL==6) {conn(\@$data)}
-        } else {
-            #two arg sub goes here
-            if ($ARGV[1] eq '-s') {
-                status(\@$data)
-            } else {
+    } else {
+            #two arg subs goes here
+            if ($ARGV[1] eq '-s') {status(\@$data)} else {
                 ossh(\@$data, $ARGV[1]);
             }
         }
     }
+    
     
 sub printer {
     my $reel = shift;
@@ -89,8 +91,8 @@ sub ossh {
 
 sub conn {
         my $data = shift;
-        for ($$data[0]) {system qq(sshrcc-q $_->{'username'}\@$_->{'hostname'})}
-        #for (@$data) {system(qq(ssh "$_->{'username'}"@"$_->{'hostname'}"))}
+        #my @pty = $ssh->system("source /etc/profile && export PATH=\$HOME/nps/bin && $cmd"); # works
+        for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
 }
 
 &chopL;
