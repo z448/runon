@@ -49,7 +49,7 @@ sub relay {
             return;
         } 
         #one arg subs goes here
-        if ($argL>2 and $argL<6) {printer(\@$data)}
+        if ($argL>2 and $argL<6) {printer(\@$data, $argL)}
         if ($argL==6) {conn(\@$data)}
     } else {
             #two arg subs goes here
@@ -61,10 +61,18 @@ sub relay {
     
     
 sub printer {
-    my $reel = shift;
+    my $reel=shift; my $argL=shift;
     for (@$reel) {
-        print "$_->{'application'}\ \> \ $_->{'hostname'}\n";
-        #print "$_->{'application'}\ \> \ $_->{'region'}\ \>\ $_->{'env'}\ \>\  $_->{'hostname'}\n"; status(\@envapps)}};
+            $a="\ $_->{'application'}\ "; $h="\ $_->{'hostname'}\ "; $r="\ $_->{'region'}\ "; $e="\ $_->{'env'}\ ";
+            $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
+            print colored(['white on_blue'], "$a"); 
+            print colored(['blue on_white'], "$r");
+            print colored(['white on_blue'], "$e");
+            print colored(['blue on_white'], "$h");
+            print "\n";
+           # print colored(['white on_blue'], "$e"); print "\n";
+                #print "$_->{'application'}\ \> \ $_->{'hostname'}\n";
+#        print "$_->{'application'}\t\>\t$_->{'hostname'}\t\>\t$_->{'region'}\t\>\t$_->{'env'}\n";
     }
 }
 
@@ -81,17 +89,13 @@ sub ossh {
         for (@$data) {
             my $con = qq($_->{'username'}\@$_->{'hostname'});
             my $ssh = Net::OpenSSH->new($con);
-            #my @pty = $ssh->system("source /etc/profile && export PATH=\$HOME/nps/bin && $cmd"); # works
             my @pty = $ssh->capture({stdin_discard => 1},"export PATH=~/nps/bin:\$PATH; echo `hostname`; $cmd");
             print @pty;
         }
-        #implement 'find w follow symlinks'
-        # runon batas 'find -L ~ -iname "*.log"'
 }
 
 sub conn {
         my $data = shift;
-        #my @pty = $ssh->system("source /etc/profile && export PATH=\$HOME/nps/bin && $cmd"); # works
         for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
 }
 
