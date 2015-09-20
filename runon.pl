@@ -62,6 +62,7 @@ sub relay {
     
 sub printer {
     my $reel=shift; my $argL=shift;
+    my $clear='clear'; system($clear);
     for (@$reel) {
             $a="\ $_->{'application'}\ "; $h="\ $_->{'hostname'}\ "; $r="\ $_->{'region'}\ "; $e="\ $_->{'env'}\ ";
             $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
@@ -69,6 +70,8 @@ sub printer {
             print colored(['blue on_white'], "$r");
             print colored(['white on_blue'], "$e");
             print colored(['blue on_white'], "$h");
+            print colored(['blue on_white'], "\ ")x(15-"$hL");
+            print colored(['white on_blue'], "\ ");
             print "\n";
            # print colored(['white on_blue'], "$e"); print "\n";
                 #print "$_->{'application'}\ \> \ $_->{'hostname'}\n";
