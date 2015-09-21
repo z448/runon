@@ -76,9 +76,6 @@ sub printer {
             print colored(['blue on_white'], "\ ")x(15-"$hL");
             print colored(['white on_blue'], "\ ");
             print "\n";
-           # print colored(['white on_blue'], "$e"); print "\n";
-                #print "$_->{'application'}\ \> \ $_->{'hostname'}\n";
-#        print "$_->{'application'}\t\>\t$_->{'hostname'}\t\>\t$_->{'region'}\t\>\t$_->{'env'}\n";
     }
 }
 
@@ -103,14 +100,15 @@ sub ossh {
 sub conn {
         my $data = shift;
         #add check for tmux; do normal ssh if N/A
+        #for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
         for (@$data) { 
-            print "$_->{'username'}\@$_->{'hostname'}";
+            print "$_->{'username'}\@$_->{'hostname'}"
+
             system(qq(tmux split-window -h "ssh $_->{'username'}\@$_->{'hostname'}")); 
             system(qq(tmux select-layout tiled > /dev/null));
         }
     }
 
-        #for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
 
 sub subAction {
 
