@@ -5,6 +5,7 @@
 use JSON;
 use Net::OpenSSH;
 use Term::ANSIColor;
+use IO::All;
 use feature 'say';
 
 $json = JSON->new->allow_nonref;
@@ -53,7 +54,9 @@ sub relay {
         if ($argL==6) {conn(\@$data)}
     } else {
             #two arg subs goes here
-            if ($ARGV[1] eq '-s') {status(\@$data)} else {
+            if ($ARGV[1] eq '-s') {status(\@$data)} 
+            elsif ($ARGV[1] eq '-f') {subAction{(\@$data)}
+            } else {
                 ossh(\@$data, $ARGV[1]);
             }
         }
@@ -99,9 +102,19 @@ sub ossh {
 
 sub conn {
         my $data = shift;
-        for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
-}
+        #add check for tmux; do normal ssh if N/A
+        for (@$data) { 
+            print "$_->{'username'}\@$_->{'hostname'}";
+            system(qq(tmux split-window -h "ssh $_->{'username'}\@$_->{'hostname'}")); 
+            system(qq(tmux select-layout tiled > /dev/null));
+        }
+    }
 
+        #for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
+
+sub subAction {
+
+}
 ##################### start ###################
 &chopL;
 
@@ -110,12 +123,23 @@ sub help {
 }
 
 sub h {
-    print "\nQUICK HELP\nuse ";
-    print colored(['bright_white on_black'],"--help");
+    print color('white');print "\nQUICK HELP"; print color('reset');print "\n(use ";
+    print color('white');print "--help"; print color('reset');
     print " for help in more detail)\n\n";
-    print "\tusage:\trunon [app][r][e]\n\n\t\t[app]\tfirst 3 characters of application name; e.g: Puma = pum";
-    print "\n\t\t[r]\tfirst character of region; e.g: amer = a";
-    print "\n\t\t[e]\tfirst character of enviroment e.g: sit = s";
+    print "\tUsage:\trunon ";
+    print color('blue'); 
+    print "[app]"; 
+    print color ('yellow'); 
+    print "[r]"; 
+    print color ('magenta');
+    print "[e]\n\n\t\t";
+    print color('blue'); print "[app]";
+    print color("reset");
+    print "\tfirst 3 characters of application name; e.g: Puma = pum)\n\t\t";
+    print color ('yellow');print "[r]"; print color('reset');
+    print "\tfirst character of region; e.g: amer = a\n\t\t";
+    print color('magenta'); print "[e]"; print color('reset');
+    print "\tfirst character of enviroment e.g: sit = s";
     print "\n\n";
 }
 
@@ -136,8 +160,8 @@ sub update {
 .
 
 =head1 SYNOPSIS
-            runon [FILTER] [/PATH/TO/SCRIPT]
-                    OR
+            runon [FILTER] [COMMAND]
+                     =
             runon [where] [what]
 .
 
