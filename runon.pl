@@ -71,7 +71,9 @@ sub printer {
             $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
             print colored(['white on_blue'], "$a"); 
             print colored(['blue on_white'], "$r");
+            print colored(['blue on_white'], "\ ")x(5-"$rL");
             print colored(['white on_blue'], "$e");
+            print colored(['white on_blue'], "\ ")x(6-"$eL");
             print colored(['blue on_white'], "$h");
             print colored(['blue on_white'], "\ ")x(15-"$hL");
             print colored(['white on_blue'], "\ ");
@@ -102,7 +104,7 @@ sub conn {
         #add check for tmux; do normal ssh if N/A
         #for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
         for (@$data) { 
-            print "$_->{'username'}\@$_->{'hostname'}"
+            print "$_->{'username'}\@$_->{'hostname'}";
 
             system(qq(tmux split-window -h "ssh $_->{'username'}\@$_->{'hostname'}")); 
             system(qq(tmux select-layout tiled > /dev/null));
