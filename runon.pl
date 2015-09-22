@@ -70,10 +70,11 @@ sub printer {
             $a="\ $_->{'application'}\ "; $h="\ $_->{'hostname'}\ "; $r="\ $_->{'region'}\ "; $e="\ $_->{'env'}\ ";
             $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
             print colored(['white on_blue'], "$a"); 
+            print colored(['white on_blue'], "\ ")x(10-"$aL");
             print colored(['blue on_white'], "$r");
-            print colored(['blue on_white'], "\ ")x(5-"$rL");
+            print colored(['blue on_white'], "\ ")x(4-"$rL");
             print colored(['white on_blue'], "$e");
-            print colored(['white on_blue'], "\ ")x(6-"$eL");
+            print colored(['white on_blue'], "\ ")x(3-"$eL");
             print colored(['blue on_white'], "$h");
             print colored(['blue on_white'], "\ ")x(15-"$hL");
             print colored(['white on_blue'], "\ ");
