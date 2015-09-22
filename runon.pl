@@ -185,3 +185,9 @@ sub update {
             runon bata      list all AMER Batman servers
             runon bataq     same as above but only QA environment
             runon bataq0    list first hostname from list above (AMER QA Batman - first server on the list)
+
+#NOTES
+# fix perldoc - HTML2Pod.pm
+# add -sub for paralel file copy
+# add check if tmux is installed / if Y - nr of window splits = nr of hosts after filtered result;
+#
