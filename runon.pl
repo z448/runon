@@ -62,24 +62,39 @@ sub relay {
         }
     }
     
-    
+my $b;my $w;
 sub printer {
-    my $reel=shift; my $argL=shift;
+    my $data=shift; my $argL=shift;
     my $clear='clear'; system($clear);
-    for (@$reel) {
-            $a="\ $_->{'application'}\ "; $h="\ $_->{'hostname'}\ "; $r="\ $_->{'region'}\ "; $e="\ $_->{'env'}\ ";
-            $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
-            print colored(['white on_blue'], "$a"); 
-            print colored(['white on_blue'], "\ ")x(10-"$aL");
-            print colored(['blue on_white'], "$r");
-            print colored(['blue on_white'], "\ ")x(4-"$rL");
-            print colored(['white on_blue'], "$e");
-            print colored(['white on_blue'], "\ ")x(3-"$eL");
-            print colored(['blue on_white'], "$h");
-            print colored(['blue on_white'], "\ ")x(15-"$hL");
-            print colored(['white on_blue'], "\ ");
-            print "\n";
-    }
+    $b='white on_blue'; $w='blue on_white';$c='blink on_white';
+    my $hostNr=scalar @$data;
+    if ($argL==3){filup($b,$w,$b,$b,$b)}
+    if ($argL==4){filup($b,$b,$w,$b,$b)}
+    if ($argL==5){filup($b,$b,$b,$w,$b)}
+    print $argL;
+
+    sub filup {
+        my $i=0;
+        my ($app,$reg,$env,$hostID,$host)=@_;
+        for (@$data) {
+                $a="\ $_->{'application'}\ "; $h="\ $_->{'hostname'}\ "; $r="\ $_->{'region'}\ "; $e="\ $_->{'env'}\ ";
+                $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
+                print colored([$app], "$a"); 
+                print colored([$app], "\ ")x(7-"$aL");
+                print colored([$reg],"\|$r\|");
+                print colored([$reg], "\ ")x(3-"$rL");
+                print colored([$env], "$e");
+                print colored([$env], "\ ")x(3-"$eL");
+                print colored([$hostID], "\|$i\|");
+                print colored([$host], "$h");
+                print colored([$host], "\ ")x(3-"$eL");
+                print colored([$host], "\ ");
+                print colored([$host], "\ ")x(15-"$hL");
+                print colored([$app], "\ ");
+                print "\n";
+                $i++;
+        }
+}
 }
 
 sub status {
