@@ -62,8 +62,8 @@ sub relay {
         }
     }
     
-my $b;my $w;
 sub printer {
+    my $b;my $w;
     my $data=shift; my $argL=shift;
     my $clear='clear'; system($clear);
     $b='white on_blue'; $w='blue on_white';$c='blink on_white';
@@ -79,22 +79,15 @@ sub printer {
         for (@$data) {
                 $a="\ $_->{'application'}\ "; $h="\ $_->{'hostname'}\ "; $r="\ $_->{'region'}\ "; $e="\ $_->{'env'}\ ";
                 $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
-                print colored([$app], "$a"); 
-                print colored([$app], "\ ")x(7-"$aL");
-                print colored([$reg],"\|$r\|");
-                print colored([$reg], "\ ")x(3-"$rL");
-                print colored([$env], "$e");
-                print colored([$env], "\ ")x(3-"$eL");
+                print colored([$app], "$a"); print colored([$app], "\ ")x(7-"$aL");
+                print colored([$reg],"\|$r\|");print colored([$reg], "\ ")x(3-"$rL");
+                print colored([$env], "$e");print colored([$env], "\ ")x(3-"$eL");
                 print colored([$hostID], "\|$i\|");
-                print colored([$host], "$h");
-                print colored([$host], "\ ")x(3-"$eL");
-                print colored([$host], "\ ");
-                print colored([$host], "\ ")x(15-"$hL");
-                print colored([$app], "\ ");
-                print "\n";
-                $i++;
+                print colored([$host], "$h");print colored([$host], "\ ")x(3-"$eL");
+                print colored([$host], "\ ");print colored([$host], "\ ")x(15-"$hL");
+                print colored([$app], "\ ");print "\n";$i++;
         }
-}
+    }
 }
 
 sub status {
