@@ -68,21 +68,21 @@ sub printer {
     ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
     print $wchar, $hchar, $wpixels, $hpixels;
     my $clear='clear'; system($clear);#print "\n"x200;
-    my $c='white on_blue'; my $w='blue on_white';$b='blue on_black';
+    my $w='white on_blue'; my $c='blue on_black';$b='dark on_black';
         
                 for(@host){$hosts{"$_->{'env'}\-$_->{'region'}"} .= "$_->{'hostname'}\ " if (($_->{'env'}=~/$env/) and ($_->{'region'}=~/$reg/));$h++}; 
      
                 for(@$data){$ap="$_->{'application'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
 
-                print colored([$c], " ");
+                print colored(['blue on_black'], "|");
                 if ($argL>=3){print colored([$w], " $ap ")}
-                if ($argL>=4){print colored([$w],"  $reg " )} else {print colored([$c]," AMER|EMEA ")};
-                if ($argL==5){print colored([$w], " $env ")} else {print colored([$c]," SIT|UAT|QA ")}
-                #print colored([$c], " $#$data ".'servers '); 
-                #print "\n";
-                print colored([$b], " ");
-                print colored([$b], "@h "); 
-                print colored([$c], " ");
+                if ($argL>=4){print colored([$w]," $reg " )}else{print colored([$c],"  AMER|EMEA")};
+                if ($argL==5){print colored([$w]," $env ")}else{print colored([$c],"  SIT|QA|UAT")}
+                if (scalar@h==1){print ' ';  print colored(['blink on_black'],' [1]'); print colored([$c],' [')} else {
+                print ' ['; print scalar @h; print ']';print colored(['blue on_black'], " [")}
+                
+                if (scalar @h<5){print colored([$b],"@h " )}else{print colored([$b], "$h[0] $h[1] $h[2] $h[3]".' ..')}
+                print colored(['blue on_black'], "]");
     print "\n";
 }
 
