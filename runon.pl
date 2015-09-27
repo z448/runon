@@ -6,6 +6,7 @@ use JSON;
 use Net::OpenSSH;
 use Term::ANSIColor;
 use IO::All;
+use Term::ReadKey;
 use feature 'say';
 
 $json = JSON->new->allow_nonref;
@@ -63,31 +64,26 @@ sub relay {
     }
     
 sub printer {
-    my $b;my $w;
-    my $data=shift; my $argL=shift;
-    my $clear='clear'; system($clear);
-    $b='white on_blue'; $w='blue on_white';$c='blink on_white';
-    my $hostNr=scalar @$data;
-    if ($argL==3){filup($b,$w,$b,$b,$b)}
-    if ($argL==4){filup($b,$b,$w,$b,$b)}
-    if ($argL==5){filup($b,$b,$b,$w,$b)}
-    print $argL;
+    $data=shift; my $argL=shift;
+    ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
+    print $wchar, $hchar, $wpixels, $hpixels;
+    my $clear='clear'; system($clear);#print "\n"x200;
+    my $c='white on_blue'; my $w='blue on_white';$b='blue on_black';
+        
+                for(@host){$hosts{"$_->{'env'}\-$_->{'region'}"} .= "$_->{'hostname'}\ " if (($_->{'env'}=~/$env/) and ($_->{'region'}=~/$reg/));$h++}; 
+     
+                for(@$data){$ap="$_->{'application'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
 
-    sub filup {
-        my $i=0;
-        my ($app,$reg,$env,$hostID,$host)=@_;
-        for (@$data) {
-                $a="\ $_->{'application'}\ "; $h="\ $_->{'hostname'}\ "; $r="\ $_->{'region'}\ "; $e="\ $_->{'env'}\ ";
-                $aL=length($_->{'application'}); $hL=length($_->{'hostname'}); $rL=length($_->{'region'}); $eL=length($_->{'env'});
-                print colored([$app], "$a"); print colored([$app], "\ ")x(7-"$aL");
-                print colored([$reg],"\|$r\|");print colored([$reg], "\ ")x(3-"$rL");
-                print colored([$env], "$e");print colored([$env], "\ ")x(3-"$eL");
-                print colored([$hostID], "\|$i\|");
-                print colored([$host], "$h");print colored([$host], "\ ")x(3-"$eL");
-                print colored([$host], "\ ");print colored([$host], "\ ")x(15-"$hL");
-                print colored([$app], "\ ");print "\n";$i++;
-        }
-    }
+                print colored([$c], " ");
+                if ($argL>=3){print colored([$w], " $ap ")}
+                if ($argL>=4){print colored([$w],"  $reg " )} else {print colored([$c]," AMER|EMEA ")};
+                if ($argL==5){print colored([$w], " $env ")} else {print colored([$c]," SIT|UAT|QA ")}
+                #print colored([$c], " $#$data ".'servers '); 
+                #print "\n";
+                print colored([$b], " ");
+                print colored([$b], "@h "); 
+                print colored([$c], " ");
+    print "\n";
 }
 
 sub status {
