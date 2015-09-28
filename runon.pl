@@ -64,19 +64,30 @@ sub printer {
     $data=shift; my $argL=shift;
     my $clear='clear'; system($clear);#print "\n"x200;
     my $w='white on_blue'; my $c='white on_black';$b='dark on_black'; my $bb='blue on_white';
+    my $blinki='blink on_white';
         
                 for(@host){$hosts{"$_->{'env'}\-$_->{'region'}"} .= "$_->{'hostname'}\ " if (($_->{'env'}=~/$env/) and ($_->{'region'}=~/$reg/));$h++}; 
      
                 for(@$data){$ap="$_->{'application'}";$user="$_->{'username'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
 
-                if ($argL>=3){print colored([$w], " NPS |")}
+                print colored([$bb], "\|");
+                if ($argL>=3){print colored([$w], "  NPS |")}
                 if ($argL>=3){print colored([$w], " $ap ")}
-                if ($argL>=4){print colored([$w],"  $reg " )}else{print colored([$c],"  AMER|EMEA ")};
-                if ($argL==5){print colored([$w]," $env ")}else{print colored([$c]," SIT|QA|UAT ")}
-                print colored(['white on_blue'],"[".scalar @h."]"); if (scalar @h==1){ print colored(["$bb"],"  $user\@"."@h");
-                print colored([$w], "\|")} else {
-                if (scalar @h<4){print colored([$bb],"@h " )}else{print "";print colored([$bb], "[$h[0] $h[1] $h[2]".' ..] ')};
                 print colored([$w], "\|");
+                if ($argL>=4){print colored([$w],"  $reg " )}else{print colored([$c]," AMER|EMEA ")};
+                print colored([$w], "\|");
+                if ($argL==5){print colored([$w]," $env ")}else{print colored([$c]," SIT|QA|UAT ")}
+
+                #print colored([$w], "\|");
+
+                print colored([$w], "\ ");
+
+                if (scalar @h==1){print colored(["$w"]," $user\@"."@h ");
+                print colored([$bb], "\ ")} else {
+                print colored([$blinki]," ".scalar @h.""); 
+                if (scalar @h<4){print colored([$bb],"@h " )}else{print colored([$bb], "$h[0] $h[1] $h[2]".' [..] ')};
+                print colored([$w], "\ ");
+                #print "\ |";
                 
 }
     print "\n";
