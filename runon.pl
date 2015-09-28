@@ -70,12 +70,12 @@ sub printer {
      
                 for(@$data){$ap="$_->{'application'}";$user="$_->{'username'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
 
-                print colored([$bb], "\|");
-                if ($argL>=3){print colored([$w], "  NPS |")}
-                if ($argL>=3){print colored([$w], " $ap ")}
-                print colored([$w], "\|");
+                print colored([$bb], "\ ");
+                if ($argL>=3){print colored([$w], "  NPS ")}
+                if ($argL>=3){print colored([$w], " $ap")}
+                print colored([$w], "\ ");
                 if ($argL>=4){print colored([$w],"  $reg " )}else{print colored([$c]," AMER|EMEA ")};
-                print colored([$w], "\|");
+                print colored([$w], "\ ");
                 if ($argL==5){print colored([$w]," $env ")}else{print colored([$c]," SIT|QA|UAT ")}
 
                 #print colored([$w], "\|");
