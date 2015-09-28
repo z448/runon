@@ -5,14 +5,11 @@
 use JSON;
 use Net::OpenSSH;
 use Term::ANSIColor;
-use IO::All;
-use Term::ReadKey;
 use feature 'say';
 
 $json = JSON->new->allow_nonref;
 my $arg;
 if ($ARGV[0]) {$arg = uc($ARGV[0])}
-
 my $argL = length($arg);
 $arg =~ s/(...)(.)?(.)?(.)?/$1$2$3$4/;
 my ($app, $reg, $env, $host) = (qr/$1/,qr/$2/,qr/$3/,qr/$4/);
@@ -65,24 +62,23 @@ sub relay {
     
 sub printer {
     $data=shift; my $argL=shift;
-    ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize();
-    print $wchar, $hchar, $wpixels, $hpixels;
     my $clear='clear'; system($clear);#print "\n"x200;
-    my $w='white on_blue'; my $c='blue on_black';$b='dark on_black';
+    my $w='white on_blue'; my $c='white on_black';$b='dark on_black'; my $bb='blue on_white';
         
                 for(@host){$hosts{"$_->{'env'}\-$_->{'region'}"} .= "$_->{'hostname'}\ " if (($_->{'env'}=~/$env/) and ($_->{'region'}=~/$reg/));$h++}; 
      
-                for(@$data){$ap="$_->{'application'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
+                for(@$data){$ap="$_->{'application'}";$user="$_->{'username'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
 
-                print colored(['blue on_black'], "|");
+                if ($argL>=3){print colored([$w], " NPS |")}
                 if ($argL>=3){print colored([$w], " $ap ")}
-                if ($argL>=4){print colored([$w]," $reg " )}else{print colored([$c],"  AMER|EMEA")};
-                if ($argL==5){print colored([$w]," $env ")}else{print colored([$c],"  SIT|QA|UAT")}
-                if (scalar@h==1){print ' ';  print colored(['blink on_black'],' [1]'); print colored([$c],' [')} else {
-                print ' ['; print scalar @h; print ']';print colored(['blue on_black'], " [")}
+                if ($argL>=4){print colored([$w],"  $reg " )}else{print colored([$c],"  AMER|EMEA ")};
+                if ($argL==5){print colored([$w]," $env ")}else{print colored([$c]," SIT|QA|UAT ")}
+                print colored(['white on_blue'],"[".scalar @h."]"); if (scalar @h==1){ print colored(["$bb"],"  $user\@"."@h");
+                print colored([$w], "\|")} else {
+                if (scalar @h<4){print colored([$bb],"@h " )}else{print "";print colored([$bb], "[$h[0] $h[1] $h[2]".' ..] ')};
+                print colored([$w], "\|");
                 
-                if (scalar @h<5){print colored([$b],"@h " )}else{print colored([$b], "$h[0] $h[1] $h[2] $h[3]".' ..')}
-                print colored(['blue on_black'], "]");
+}
     print "\n";
 }
 
@@ -160,39 +156,66 @@ sub update {
     system("curl -kLO `cat .runon`");
 }
 
-=head1 NAME
-            runon CLI tool for remote execution of local command on group of servers filtered by keyword
-.
 
-=head1 SYNOPSIS
-            runon [FILTER] [COMMAND]
-                     =
-            runon [where] [what]
-.
+=head1 NAME
+
+=over 16
+
+=item runon - CLI tool to easily connect and run commands on group of remote servers 
+
+=back 
+
+=head1 SYNTAX
+
+=over 16
+
+=item runon [FILTER] [COMMAND]
+
+=item runon [where] [what]
+
+=back
 
 =head1 DESCRIPTION
-            All parameters are optional, i.e: without providing one it will output list of all nps hosts.
-            Passing one parameter it'll list hostname based on pattern. Use it to narrow down list of hostnames
-.
-            FILTER ($1) is a string to be used as PATTERN which narrows down the list of hostnames on output
-.
-                    PATTERN
-                            app name    - first 3 characters of appname ( e.g: batman = bat )
-                            region      - first character of region (e.g: a or e )
-                            environment - first character of env (e.g: s,q,u,g)
-                            host number - from 0 to 9
-.
-            PATH ($2) is a local path of script to be copied and executed on group of remote hosts (e.g:  /home/user/myscript )
-.
+
+=over 16
+
+=item All parameters are optional, without providing one it will output list of all nps hosts. Passing one parameter it'll list hostname based on pattern. Use it to narrow down list of hostnames
+
+=head2 SEARCH PATTERN ($1) 
+
+=item - a string to be used when searching through hostnames which narrows down the list of hostnames on output
+
+=item app name    - first 3 characters of appname ( e.g: batman = bat )
+region      - first character of region (e.g: a or e )
+environment - first character of env (e.g: s,q,u,g)
+host number - from 0 to 9
+
+=back 
+
+=head2 CMD ($2)  
+
+=over 20
+
+- command executed on group of remote hosts (e.g:  /home/user/myscript )
+
+=back 
 
 =head1 EXAMPLES
-            runon bat       list all Batman servers
-            runon bata      list all AMER Batman servers
-            runon bataq     same as above but only QA environment
-            runon bataq0    list first hostname from list above (AMER QA Batman - first server on the list)
 
-#NOTES
-# fix perldoc - HTML2Pod.pm
-# add -sub for paralel file copy
-# add check if tmux is installed / if Y - nr of window splits = nr of hosts after filtered result;
-#
+=over 20
+
+=item runon bat       list all Batman servers
+=itemrunon bata      list all AMER Batman servers
+runon bataq     same as above but only QA environment
+runon bataq0    list first hostname from list above (AMER QA Batman - first server on the list)
+
+=item NOTES
+
+fix perldoc - HTML2Pod.pm
+add -sub for paralel file copy
+add check if tmux is installed / if Y - nr of window splits = nr of hosts after filtered result;
+
+=back
+
+=cut
+
