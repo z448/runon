@@ -86,8 +86,7 @@ sub printer {
                 print colored([$bb], "\ ")} else {
                 print colored([$blinki]," ".scalar @h.""); 
                 if (scalar @h<4){print colored([$bb],"@h " )}else{print colored([$bb], "$h[0] $h[1] $h[2]".' [..] ')};
-                print colored([$w], "\ ");
-                #print "\ |";
+#                print colored([$w], "\ ");
                 
 }
     print "\n";
@@ -114,16 +113,15 @@ sub ossh {
 sub conn {
         my $data = shift;
         #add check for tmux; do normal ssh if N/A
-        #for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}
         for (@$data) { 
             print "$_->{'username'}\@$_->{'hostname'}";
-
             system(qq(tmux split-window -h "ssh $_->{'username'}\@$_->{'hostname'}")); 
             system(qq(tmux select-layout tiled > /dev/null));
         }
     }
 
-
+sub con {for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}}
+        
 sub subAction {
 
 }
