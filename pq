@@ -50,7 +50,7 @@ sub relay {
         unless(defined $ARGV[0]) {&h}
         #one arg subs goes here
         if ($argL>2 and $argL<6) {printer(\@$data, $argL)}
-        if ($argL==6) {conn(\@$data)}
+        if ($argL==6) {con(\@$data)}
     } else {
             #two arg subs goes here
             if ($ARGV[1] eq '-s') {status(\@$data)} 
@@ -72,22 +72,33 @@ sub printer {
     for(@$data){$ap="$_->{'application'}";$user="$_->{'username'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
 
     sub trimLine {
-        my ($fill)=@_;
+        my ($color)=@_;
         @x = qx(stty -a);
         @y = split(/;/, $x[0]);
         my $line=$y[2];
-        my $restLine=($line-41);
+        #print "\nline is $line\n";
+
+        sub baseLine {
+            if($argL==3){return (47+length $ap)}
+            if($argL==4){return (39+length $ap)}
+            if($argL==5){return (30+length $ap)}
+            #if ($argL==3){return (38+length $ap)}
+        }
+        #print "baseline is".&baseLine;print "\n";
+        my @hostLine;
+        $restLine=abs($line-&baseLine);
+        my $chars;
         #print "\n\$restLine is " . $restLine . "\n";
-        my $hostLine;
             for (@h){
                     $chars .= $_;
                 if (length $chars>$restLine){last}else{
                     push @hostLine, $_;
                 }
             }
+        sub lH {for(@hostLine){$hL.=$_};length $hL}
+        $empty=$restLine-(&lH+scalar @hostLine); 
+        #print "which leaves empty $empty\n";
 
-        $empty=$restLine-length $chars; 
-        $charsL=length $chars; 
         $trimLine=$line-$charsL+scalar @h; #nr of chars that needs to be trimmed from bar
         {
             use integer;
@@ -97,40 +108,41 @@ sub printer {
         #print "$float";
         #print "\n";
         #print "$trimLine";
-        unless($fill eq 'empty'){print colored(["$w"],@hostLine)}else{
-            print colored(["$w"],@hostLine)};
+        if (scalar@h==1){print colored(['blink on_blue'], "\=> ")}
+        #if ($argL==5 and scalar@h>1){
+        $hNR=0;
+            for (@hostLine){
+                print colored(['blue on_white'], "$hNR");
+                print colored([$color], "$_ ");
+                $hNR++;
+            }
+        print colored([$color], "\ "x$empty);
+        # print colored(["$w"],("\ "+$empty));
     }
 
+        if (scalar@h >1 ){print colored(['blink on_red'], scalar@h); print colored(['white on_red'], " ")}else{print colored([$bb], "\  ")};
+        if ($argL>=3){print colored([$w], " NPS |  ")}
 
-    #print colored(['white on_white'], "\  ");
-                print colored(['blink on_red'], scalar@h);
-                if ($argL>=3){print colored([$w], " NPS ")}
-                print colored([$w], "\ ");
-                if ($argL>=3){print colored([$w], " $ap ")}
-                print colored([$w], "\ ");
-                if ($argL>=4){print colored([$w]," $reg ")}else{print colored([$c]," AMER | EMEA ")};
-                print colored([$w], "\ ");
-                if ($argL==5){print colored([$w]," $env ")}else{print colored([$c]," SIT | QA | UAT ")}
-                print colored(['white on_blue'], "\|");
-                &trimLine('empty');
-                #print colored(["$w"],&trimLine('filled'));
-                #print colored(["$bb"],&trimLine('empty'));
-                #print colored(['blue on_blue'],"\  ");
+        if ($argL>=3){print colored([$w], "$ap ");print colored([$w], "\|")}
+        
+        if ($argL==3){print colored([$c]," AMER");print colored(['blink']," -");print colored([$c]," EMEA ");print colored([$w], "\ ")};
+        if ($argL>=4){print colored([$w],"  $reg ")};
 
-                #if (scalar @h==1){print colored(["$w"]," $user\@"."@h ");
+        #print colored([$w], "\ ");
 
-                #print colored(['black on_white'], "\ ")} else {
-                #if (scalar @h<4){print colored(['black on_white'],"@h " )}else{print colored([$bb], "$h[0] $h[1] $h[2]".' [..] ')};
-                #print colored{print colored(['white on_blue'],"&trimline " )}(['blink on_blue']," ".scalar @h." "); 
-                #print colored([$w], "\ ");
-                #}
-    print "\n";
+        if ($argL==3){print colored([$c]," SIT - QA - UAT ")};
+        if ($argL==4){print colored([$c]," SIT");print colored(['blink']," -");print colored([$c]," QA");print colored(['blink']," -");print colored([$c]," UAT ")};
+        
+        if ($argL==5){print colored([$w],"| $env ")};
+        &trimLine('white on_blue');
+        #print colored([$w], "\ "x$empty);
+        #  print colored([$w], " ");
+        print colored(['blue on_white'], " ");
+        
+        print "\n";
+
+
 }
-
-
-
-
-
 
 sub status {
     my $data = shift;
@@ -153,6 +165,7 @@ sub ossh {
 sub conn {
         my $data = shift;
         #add check for tmux; do normal ssh if N/A
+            print  "\n"x300;
         for (@$data) { 
             print "$_->{'username'}\@$_->{'hostname'}";
             system(qq(tmux split-window -h "ssh $_->{'username'}\@$_->{'hostname'}")); 
@@ -160,7 +173,10 @@ sub conn {
         }
     }
 
-sub con {for ($$data[0]) {system(qq(sshrc -q $_->{'username'}\@$_->{'hostname'}))}}
+sub con {
+    my $data = shift;
+    print "$_->{'username'}\@$_->{'hostname'}";
+    for (@$data) {system(qq(ssh -q $_->{'username'}\@$_->{'hostname'}))}}
         
 sub subAction {
 

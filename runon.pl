@@ -72,7 +72,7 @@ sub printer {
     for(@$data){$ap="$_->{'application'}";$user="$_->{'username'}";$env="$_->{'env'}";$reg="$_->{'region'}"; $host="$_->{'hostname'}"; push @h," $host" }; 
 
     sub trimLine {
-        my ($fill)=@_;
+        my ($fill, $empty)=@_;
         @x = qx(stty -a);
         @y = split(/;/, $x[0]);
         my $line=$y[2];
@@ -81,12 +81,10 @@ sub printer {
         my $hostLine;
             for (@h){
                     $chars .= $_;
-                if (length $chars>$restLine){last}else{
+                if (length $chars>$restLine){$empty=$chars-$restLine; last}else{
                     push @hostLine, $_;
                 }
             }
-
-        $empty=$restLine-length $chars; 
         $charsL=length $chars; 
         $trimLine=$line-$charsL+scalar @h; #nr of chars that needs to be trimmed from bar
         {
@@ -98,7 +96,8 @@ sub printer {
         #print "\n";
         #print "$trimLine";
         unless($fill eq 'empty'){print colored(["$w"],@hostLine)}else{
-            print colored(["$w"],@hostLine)};
+            print colored(["$w"],@hostLine);
+            print colored(['blue on_white'],"\ ")}
     }
 
 
@@ -112,10 +111,8 @@ sub printer {
                 print colored([$w], "\ ");
                 if ($argL==5){print colored([$w]," $env ")}else{print colored([$c]," SIT | QA | UAT ")}
                 print colored(['white on_blue'], "\|");
-                &trimLine('empty');
-                #print colored(["$w"],&trimLine('filled'));
-                #print colored(["$bb"],&trimLine('empty'));
-                #print colored(['blue on_blue'],"\  ");
+                print colored(["$w"],&trimLine('filled'));
+                print colored(['blue on_blue'],"\  ");
 
                 #if (scalar @h==1){print colored(["$w"]," $user\@"."@h ");
 
