@@ -79,9 +79,9 @@ sub printer {
         #print "\nline is $line\n";
 
         sub baseLine {
-            if($argL==3){return (47+length $ap)}
+            if($argL==3){return (46+length $ap)}
             if($argL==4){return (39+length $ap)}
-            if($argL==5){return (30+length $ap)}
+            if($argL==5){return (29+length $ap)}
             #if ($argL==3){return (38+length $ap)}
         }
         #print "baseline is".&baseLine;print "\n";
@@ -91,7 +91,7 @@ sub printer {
         #print "\n\$restLine is " . $restLine . "\n";
             for (@h){
                     $chars .= $_;
-                if (length $chars>$restLine){last}else{
+                if (length $chars>=$restLine){last}else{
                     push @hostLine, $_;
                 }
             }
@@ -108,7 +108,7 @@ sub printer {
         #print "$float";
         #print "\n";
         #print "$trimLine";
-        if (scalar@h==1){print colored(['blink on_blue'], "\=> ")}
+        #if (scalar@h==1){print colored(['blink on_blue'], "\=> ")}
         #if ($argL==5 and scalar@h>1){
         $hNR=0;
             for (@hostLine){
@@ -120,7 +120,9 @@ sub printer {
         # print colored(["$w"],("\ "+$empty));
     }
 
-        if (scalar@h >1 ){print colored(['blink on_red'], scalar@h); print colored(['white on_red'], " ")}else{print colored([$bb], "\  ")};
+        if (scalar@h >9){print colored(['blink on_red'], scalar@h)}else{print colored(['blink on_red'], scalar@h); print colored(['blink on_red'],"\ ")}
+        
+
         if ($argL>=3){print colored([$w], " NPS |  ")}
 
         if ($argL>=3){print colored([$w], "$ap ");print colored([$w], "\|")}
@@ -131,9 +133,9 @@ sub printer {
         #print colored([$w], "\ ");
 
         if ($argL==3){print colored([$c]," SIT - QA - UAT ")};
-        if ($argL==4){print colored([$c]," SIT");print colored(['blink']," -");print colored([$c]," QA");print colored(['blink']," -");print colored([$c]," UAT ")};
+        if ($argL==4){print colored([$c]," SIT ");print colored(['blink'],"-");print colored([$c]," QA ");print colored(['blink'],"-");print colored([$c]," UAT ")};
         
-        if ($argL==5){print colored([$w],"| $env ")};
+        if ($argL==5){if($env eq "QA"){print colored([$w],"| QA  ")}else{print colored([$w],"| $env ")}};
         &trimLine('white on_blue');
         #print colored([$w], "\ "x$empty);
         #  print colored([$w], " ");
