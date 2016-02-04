@@ -1,0 +1,2 @@
+#!/bin/bash
+`ssh 10.0.0.33 -l root $(<sh.txt)`

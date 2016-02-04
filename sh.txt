@@ -1,0 +1,16 @@
+export PATH=/usr/local/bin:$PATH;
+bash -c 'echo "$PATH" >> sh.log';
+echo "$HOME" >> sh.log;
+
+echo "echo $HOME";
+bash -c 'echo "echo $HOME"';
+echo -e "\n\n";
+perl -E 'say @INC';
+
+perl -E '
+say @INC;
+say $ENV{PATH};
+print "\n\n";
+';
+
+bash -c 'cpan PPI >> sh.log';
