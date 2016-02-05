@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use warnings;
+use strict;
+
+use File::Find;
+use Term::ANSIColor;
+
+my @directories = ();
+
+unless( $ARGV[0] ){
+    push @directories, '_build_';
+} else {
+    push @directories, $ARGV[0];
+}
+
+my $current_dir = '_build_';
+my @dir_content = ();
+my $packlist = '.packlist';
+my @packlist = ();
+my %found;
+
+find(\&wanted, @directories );
+
+sub wanted {
+    if ( $_ eq $packlist ){
+        push @packlist, "$File::Find::dir/$_";
+    } 
+}
+
+{ say @packlist }
