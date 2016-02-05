@@ -4,9 +4,11 @@ use 5.010;
 use Net::OpenSSH;
 use Term::ANSIColor;
 
-my @hosts = qw( root@10.0.0.33 root@10.0.0.34 );
+my @hosts = qw( root@10.0.0.33 z8@10.0.0.36 z@10.0.0.35 );
+my $module = $ARGV[0];
 
-my $cmd = q!echo 'PATH is '$PATH && echo 'HOME is '$HOME!;
+my $cmd = q!export PATH="/usr/local/bin:$PATH" && mkdir -p _build_/!.qq!$module!.q! && cpanm -L _build_/!.qq!$module!.qq! $module!;
+#my $cmd = q!echo 'PATH is '$PATH && echo 'HOME is '$HOME!;
 say "\nrunning:"; print colored( "$cmd\n", 'blue' ); say "on: @hosts";
 
 
