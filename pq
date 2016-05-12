@@ -15,7 +15,7 @@ $arg =~ s/(...)(.)?(.)?(.)?/$1$2$3$4/;
 my ($app, $reg, $env, $host) = (qr/$1/,qr/$2/,qr/$3/,qr/$4/);
 
 
-my $fn = "$ENV{'HOME'}/nps/bin/etc/.apps.json";
+my $fn = "./.apps.json";
 my $jdata;
 {
         open(my $fh, '<:encoding(UTF-8)', $fn) or die;
