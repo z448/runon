@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use warnings;
+use strict;
+
+use Data::Dumper;
+use JSON::PP;
+#use open qw<:encoding(UTF-8)>;
+
+sub read_config {
+    my $path = shift;
+    local $/;
+    open(my $fh,"<", $path) || die "cant open $path: $!";
+    my $json = <$fh>;
+    my $p = decode_json $json;
+}
+
+sub filter {
+    my $keyword = shift;
+
+    my $keyword_length = length $keyword;
+    my $config = read_config('.apps.json');
+    my @filtered = ();
+    my %filter = ();
+
+    if($keyword_length >= 3){
+        $filter{application} = $keyword;
+        $filter{application} =~ s/(...)/$1/;
+
+        say "keyword: $filter{application}";
+        @filtered = grep { my $substr =~ substr $_->{application}, 0, 3; $substr eq $filter{application} } @$config;
+    } 
+    if($keyword_length >= 4){
+        $filter{region} = $keyword;
+        $filter{region} =~ s/(...)(.)/$2/;
+        say "keyword: $filter{region}";
+        
+        @filtered = grep { my $substr = substr $_->{region}, 0, 1; print $substr; $substr eq $filter{region} } @filtered;
+    }
+    if($keyword_length >= 5){
+        $filter{environment} = $keyword;
+        $filter{environment} =~ s/(....)(.)/$2/;
+        say "keyword: $filter{environment}";
+        @filtered = grep { my $substr = substr $_->{environment}, 0, 1; $substr eq $filter{environment} } @filtered;
+    }
+
+    for(@filtered){
+        say $_->{application} . "  " . $_->{region} . "  " . $_->{environment};
+    }
+}
+
+filter("$ARGV[0]");
+
+
