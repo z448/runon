@@ -4,9 +4,14 @@ use 5.010;
 use warnings;
 use strict;
 
+use Term::ANSIColor;
 use Data::Dumper;
 use JSON::PP;
-#use open qw<:encoding(UTF-8)>;
+use open qw<:encoding(UTF-8)>;
+
+# for verbose output change RUNON_DEBUG to 1;
+$ENV{RUNON_DEBUG} = 1;
+ 
 
 sub read_config {
     my $path = shift;
@@ -24,32 +29,30 @@ sub filter {
     my @filtered = ();
     my %filter = ();
 
+    die "min 3 characters required" if $keyword_length <= 2;
     if($keyword_length >= 3){
-        $filter{application} = $keyword;
-        $filter{application} =~ s/(...)/$1/;
-
-        say "keyword: $filter{application}";
-        @filtered = grep { my $substr =~ substr $_->{application}, 0, 3; $substr eq $filter{application} } @$config;
+        say "keyword: " . substr( $keyword, 0, 3) if $ENV{RUNON_DEBUG};
+        @filtered = grep { substr($_->{application}, 0, 3) eq substr( $keyword, 0, 3) } @$config;
     } 
     if($keyword_length >= 4){
-        $filter{region} = $keyword;
-        $filter{region} =~ s/(...)(.)/$2/;
-        say "keyword: $filter{region}";
-        
-        @filtered = grep { my $substr = substr $_->{region}, 0, 1; print $substr; $substr eq $filter{region} } @filtered;
+        say "keyword: " . substr($keyword, 3, 1) if $ENV{RUNON_DEBUG};
+        @filtered = grep { substr( $_->{region}, 0, 1 ) eq substr($keyword, 3, 1) } @filtered;
     }
     if($keyword_length >= 5){
-        $filter{environment} = $keyword;
-        $filter{environment} =~ s/(....)(.)/$2/;
-        say "keyword: $filter{environment}";
-        @filtered = grep { my $substr = substr $_->{environment}, 0, 1; $substr eq $filter{environment} } @filtered;
+        say "keyword: " . substr( $keyword, 4, 1) if $ENV{RUNON_DEBUG};
+        @filtered = grep { substr( $_->{environment}, 0, 1 ) eq substr( $keyword, 4, 1) } @filtered;
     }
+    return \@filtered;
+}
 
-    for(@filtered){
-        say $_->{application} . "  " . $_->{region} . "  " . $_->{environment};
+sub printer {
+    my $keyword = shift;
+    my $results = filter($keyword);
+
+    for(@$results){
+        say colored(['white on_blue'],$_->{application}) . "  " . $_->{region} . "  " . $_->{environment};
     }
 }
 
-filter("$ARGV[0]");
-
+printer("$ARGV[0]");
 
