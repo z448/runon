@@ -42,17 +42,19 @@ sub filter {
         say "keyword: " . substr( $keyword, 4, 1) if $ENV{RUNON_DEBUG};
         @filtered = grep { substr( $_->{environment}, 0, 1 ) eq substr( $keyword, 4, 1) } @filtered;
     }
-    return \@filtered;
+    return \@filtered, $keyword_length;
 }
 
-sub printer {
+sub relay {
     my $keyword = shift;
-    my $results = filter($keyword);
+    my( $results, $keyword_lenght )  = filter($keyword);
 
     for(@$results){
-        say colored(['white on_blue'],$_->{application}) . "  " . $_->{region} . "  " . $_->{environment};
+       for( my($key, $value) = each(%$_)){
+           print $key . ' ' . $value . ' ' . "\n";
+       }
     }
 }
 
-printer("$ARGV[0]");
+relay("$ARGV[0]");
 
