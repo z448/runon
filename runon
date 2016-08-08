@@ -4,6 +4,7 @@ use 5.010;
 use warnings;
 use strict;
 
+use List::MoreUtils qw< uniq >;
 use Term::ANSIColor;
 use Data::Dumper;
 use JSON::PP;
@@ -11,6 +12,8 @@ use open qw<:encoding(UTF-8)>;
 
 # for verbose output change RUNON_DEBUG to 1;
 $ENV{RUNON_DEBUG} = 1;
+my $config = read_config('.apps.json');
+my %max_length;
  
 
 sub read_config {
@@ -21,39 +24,70 @@ sub read_config {
     my $p = decode_json $json;
 }
 
+sub max_length {
+    my (@environment, @region, @hostname) = ();
+
+    for(@$config){ 
+        push @environment, $_->{environment};
+        push @hostname, $_->{hostname};
+        push @region, $_->{region};
+    }
+    $max_length{environment} = length join('', uniq @environment);
+    $max_length{region} = length join('', uniq @region);
+    $max_length{hostname} = length join('', uniq @hostname);
+}
+max_length();
+
 sub filter {
     my $keyword = shift;
-
-    my $keyword_length = length $keyword;
-    my $config = read_config('.apps.json');
+    my $keylength = length $keyword;
     my @filtered = ();
     my %filter = ();
 
-    die "min 3 characters required" if $keyword_length <= 2;
-    if($keyword_length >= 3){
+
+    say length join('', my @region_length = grep { $_->{environment} } @$config);
+
+    die "min 3 characters required" if $keylength <= 2;
+    if($keylength >= 3){
         say "keyword: " . substr( $keyword, 0, 3) if $ENV{RUNON_DEBUG};
         @filtered = grep { substr($_->{application}, 0, 3) eq substr( $keyword, 0, 3) } @$config;
     } 
-    if($keyword_length >= 4){
+    if($keylength >= 4){
         say "keyword: " . substr($keyword, 3, 1) if $ENV{RUNON_DEBUG};
         @filtered = grep { substr( $_->{region}, 0, 1 ) eq substr($keyword, 3, 1) } @filtered;
     }
-    if($keyword_length >= 5){
+    if($keylength >= 5){
         say "keyword: " . substr( $keyword, 4, 1) if $ENV{RUNON_DEBUG};
         @filtered = grep { substr( $_->{environment}, 0, 1 ) eq substr( $keyword, 4, 1) } @filtered;
     }
-    return \@filtered, $keyword_length;
+    return \@filtered, $keylength;
 }
+
+sub array_length {
+        return length join('', @{$_[0]});
+}
+
+
 
 sub relay {
     my $keyword = shift;
-    my( $results, $keyword_lenght )  = filter($keyword);
+    my( @region, @environment, @host ) = ();
+    my( $results, $keylength )  = filter($keyword);
 
     for(@$results){
-       for( my($key, $value) = each(%$_)){
-           print $key . ' ' . $value . ' ' . "\n";
-       }
+        push @region, $_->{region};
+        push @environment, $_->{environment};
+        push @host, $_->{hostname};
     }
+
+    if($keylength == 3){
+        print colored(['white on_blue'], $keyword); print colored(['blue on_white'],join(' - ',@region)); print 'x'x($max_length{environment} - array_length(\@environment)); print colored(['white on_blue'],@environment); print colored(['white on_blue'],'|'); print colored(['white on_blue'],@host); print "\n";
+        print array_length(\@region);
+    } 
+    elsif($keylength == 4){
+        print colored(['white on_blue'],@region); print ' '; print @environment; print ' '; print @host; print "\n";
+    }
+
 }
 
 relay("$ARGV[0]");
