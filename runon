@@ -14,8 +14,10 @@ use open qw<:encoding(UTF-8)>;
 $ENV{RUNON_DEBUG} = 1;
 my $config = read_config('.runon');
 my %max_len = %{ max_len() };
+my %c = ( default => 'white on_blue', select => 'blue on_white', );
+#my %c = ( default => 'white on_grey3', select => 'white on_grey6', );
 #my $config = read_config('.apps.json');
- 
+
 
 sub read_config {
     my $path = shift;
@@ -45,25 +47,26 @@ sub max_len {
 
 sub filter {
     my $keyword = shift;
+    my( @filtered, %filter ) = ();
     my $keylength = length $keyword;
-    my @filtered = ();
-    my %filter = ();
-
 
     say length join('', my @region_length = grep { $_->{environment} } @$config);
 
     die "min 3 characters required" if $keylength <= 2;
     if($keylength >= 3){
         say "keyword: " . substr( $keyword, 0, 3) if $ENV{RUNON_DEBUG};
-        @filtered = grep { substr($_->{application}, 0, 3) eq substr( $keyword, 0, 3) } @$config;
+        @filtered = grep { substr(lc $_->{application}, 0, 3) eq substr( lc $keyword, 0, 3) } @$config;
+        #@filtered = grep { substr($_->{application}, 0, 3) eq substr( $keyword, 0, 3) } @$config;
     } 
     if($keylength >= 4){
         say "keyword: " . substr($keyword, 3, 1) if $ENV{RUNON_DEBUG};
-        @filtered = grep { substr( $_->{region}, 0, 1 ) eq substr($keyword, 3, 1) } @filtered;
+        @filtered = grep { substr( lc $_->{region}, 0, 1 ) eq substr(lc $keyword, 3, 1) } @filtered;
+        #@filtered = grep { substr( $_->{region}, 0, 1 ) eq substr($keyword, 3, 1) } @filtered;
     }
     if($keylength >= 5){
         say "keyword: " . substr( $keyword, 4, 1) if $ENV{RUNON_DEBUG};
-        @filtered = grep { substr( $_->{environment}, 0, 1 ) eq substr( $keyword, 4, 1) } @filtered;
+        @filtered = grep { substr( lc $_->{environment}, 0, 1 ) eq substr( lc $keyword, 4, 1) } @filtered;
+        #@filtered = grep { substr( $_->{environment}, 0, 1 ) eq substr( $keyword, 4, 1) } @filtered;
     }
     return \@filtered, $keylength;
 }
@@ -84,16 +87,39 @@ sub relay {
         push @environment, $_->{environment};
         push @host, $_->{hostname};
     }
+    # has to be uniq otherwise it would display AMER - AMER if there is App only in AMER region but on more environments
+    @region = uniq @region; @environment = uniq @environment; 
 
-    say "keylength: $keylength";
+    system("clear");
+    my $host_nr = colored([$c{select}], $#host + 1); # number of filtered hosts
+    my $joint = colored([$c{default}],' ');
     if($keylength == 3){
-        print colored(['white on_blue'], $keyword); print colored(['blue on_white'],join(' - ',@region)); print 'x'x($max_len{environment} - array_length(\@environment)); print colored(['white on_blue'],@environment); print colored(['white on_blue'],'|'); print colored(['white on_blue'],@host); print "\n";
-        print array_length(\@region);
+        my $line = join( $joint, 
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{select}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)) , colored([$c{default}],join(' ',@host)), colored([$c{select}], $#host + 1) )
+        );
+        print $line . "\n";
     } 
+
     elsif($keylength == 4){
-        print colored(['white on_blue'], join(' - ', @region)); print ' '; print @environment; print ' '; print @host; print "\n";
+        my $line = join( $joint,
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{select}],join(' - ',@environment)) , colored([$c{default}],join(' ',@host)), colored([$c{select}], $#host + 1) )
+        );
+        print $line . "\n";
     }
 
+    elsif($keylength == 5){
+        # make host string adding index nr to each for selection
+        my $host = colored([$c{default}],' '); my $h = 0;
+        for( @host ){ 
+            $host .= colored([$c{select}],$h) . colored([$c{default}],$_);
+            $h++;
+        }
+
+        my $line = join( $joint,
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)) , $host, colored([$c{select}], $#host + 1) )
+        );
+        print $line . "\n";
+    }
 }
 
 relay("$ARGV[0]");

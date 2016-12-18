@@ -24,6 +24,14 @@
     "environment": "UAT"
   },
   {
+    "hostname": "10.0.0.138",
+    "application": "apbapp",
+    "region": "AMER",
+    "appid": "3576",
+    "username": "mobile",
+    "environment": "UAT"
+  },
+  {
     "application": "apcapp",
     "region": "ASIA",
     "appid": "3502",
