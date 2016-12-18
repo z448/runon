@@ -15,9 +15,7 @@ $ENV{RUNON_DEBUG} = 1;
 my $config = read_config('.runon');
 my %max_len = %{ max_len() };
 my %c = ( default => 'white on_blue', select => 'blue on_white', );
-#my %c = ( default => 'white on_grey3', select => 'white on_grey6', );
-#my $config = read_config('.apps.json');
-
+my $joint = colored([$c{default}],' ');
 
 sub read_config {
     my $path = shift;
@@ -56,17 +54,14 @@ sub filter {
     if($keylength >= 3){
         say "keyword: " . substr( $keyword, 0, 3) if $ENV{RUNON_DEBUG};
         @filtered = grep { substr(lc $_->{application}, 0, 3) eq substr( lc $keyword, 0, 3) } @$config;
-        #@filtered = grep { substr($_->{application}, 0, 3) eq substr( $keyword, 0, 3) } @$config;
     } 
     if($keylength >= 4){
         say "keyword: " . substr($keyword, 3, 1) if $ENV{RUNON_DEBUG};
         @filtered = grep { substr( lc $_->{region}, 0, 1 ) eq substr(lc $keyword, 3, 1) } @filtered;
-        #@filtered = grep { substr( $_->{region}, 0, 1 ) eq substr($keyword, 3, 1) } @filtered;
     }
     if($keylength >= 5){
         say "keyword: " . substr( $keyword, 4, 1) if $ENV{RUNON_DEBUG};
         @filtered = grep { substr( lc $_->{environment}, 0, 1 ) eq substr( lc $keyword, 4, 1) } @filtered;
-        #@filtered = grep { substr( $_->{environment}, 0, 1 ) eq substr( $keyword, 4, 1) } @filtered;
     }
     return \@filtered, $keylength;
 }
@@ -91,58 +86,44 @@ sub show {
     @region = uniq @region; @environment = uniq @environment; 
 
     my $term_width  = int `tput cols`;
-    my $joint = colored([$c{default}],' ');
     
     # add host from filtered host array until it wont fit terminal. Then add number of hosts that didnt fit.
-    my $host_line = sub {
-        my $base_line_width = length(join($joint, ($$results[0]->{application}), join(' - ',@environment), join(' - ',@region)));
-        my $host_line_space = int $term_width - int $base_line_width;
-        my $host_line = '_'; my $host_line_colored = '_'; my $h = 0;
-        for( @host ){
+    my $host_line_colored = "_"; my $host_line = " ";my $h = 0;
+    my $line_width = join($joint, ($$results[0]->{application}, join(' - ',@environment), join(' - ',@region)));
+    for( @host ){
+        $host_line .= "$_$h";
+        $line_width = int(length($line_width) - 1 );
+        if(($line_width + length($host_line)) < $term_width){
             if( $keylength == 5 ){ 
-                $host_line .= $h . $_;
-                $host_line_colored .= colored([$c{select}],$h) . colored([$c{default}],$_) if $host_line_space > length( (length $host_line) - 1);
+                $host_line_colored = $host_line_colored . colored([$c{select}],$h) . colored([$c{default}],$_);
             } else { 
-                $host_line .= ' ' . $_;
-                $host_line_colored .= colored([$c{default}],' ') . colored([$c{default}],$_) if $host_line_space > length( (length $host_line) - 1);
+                $host_line_colored = $host_line_colored . colored([$c{default}],' ') . colored([$c{default}],$_);
             }
-            $h++;
         }
-        $host_line_colored =~ s/^_//;
-    say "term_width:$term_width";
-    say "base_line_width:$base_line_width";
-        return $host_line_colored;
-    };
-    my $host = $host_line->();
+        $h++;
+    }
+    $host_line_colored =~ s/^_//;
 
-    #system("clear");
+    system("clear");
     my $host_nr = colored([$c{select}], $#host + 1); # number of filtered hosts
 
     if($keylength == 3){
         my $line = join( $joint, 
-            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{select}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)), $host, colored([$c{select}], $#host + 1) )
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{select}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)), $host_line_colored, colored([$c{select}], $#host + 1) )
         );
         print $line . "\n";
     } 
 
     elsif($keylength == 4){
         my $line = join( $joint,
-            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{select}],join(' - ',@environment)) , $host, colored([$c{select}], $#host + 1) )
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{select}],join(' - ',@environment)) , $host_line_colored, colored([$c{select}], $#host + 1) )
         );
         print $line . "\n";
     }
 
     elsif($keylength == 5){
-        # make host string replacing space with index nr to each for selection
-        #my $host = '_'; my $h = 0;
-        #for( @host ){ 
-        #    $host .= colored([$c{select}],$h) . colored([$c{default}],$_);
-        #    $h++;
-        #}
-        #$host =~ s/^_//;
-
         my $line = join( $joint,
-            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)) , $host, colored([$c{select}], $#host + 1) )
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)) , $host_line_colored, colored([$c{select}], $#host + 1) )
         );
         print $line . "\n";
     }
