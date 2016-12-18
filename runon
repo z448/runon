@@ -12,8 +12,9 @@ use open qw<:encoding(UTF-8)>;
 
 # for verbose output change RUNON_DEBUG to 1;
 $ENV{RUNON_DEBUG} = 1;
-my $config = read_config('.apps.json');
-my %max_length;
+my $config = read_config('.runon');
+my %max_len = %{ max_len() };
+#my $config = read_config('.apps.json');
  
 
 sub read_config {
@@ -24,19 +25,23 @@ sub read_config {
     my $p = decode_json $json;
 }
 
-sub max_length {
-    my (@environment, @region, @hostname) = ();
+sub max_len {
+    my (@environment, @region, @hostname, %max_len) = ();
 
     for(@$config){ 
         push @environment, $_->{environment};
         push @hostname, $_->{hostname};
         push @region, $_->{region};
     }
-    $max_length{environment} = length join('', uniq @environment);
-    $max_length{region} = length join('', uniq @region);
-    $max_length{hostname} = length join('', uniq @hostname);
+    my $test = length join('', uniq @environment);
+    say $test;
+    $max_len{environment} = length( join('', uniq @environment) );
+    $max_len{region} = length( join('', uniq @region) );
+    $max_len{hostname} = length( join('', uniq @hostname) );
+    \%max_len;
 }
-max_length();
+
+
 
 sub filter {
     my $keyword = shift;
@@ -80,12 +85,13 @@ sub relay {
         push @host, $_->{hostname};
     }
 
+    say "keylength: $keylength";
     if($keylength == 3){
-        print colored(['white on_blue'], $keyword); print colored(['blue on_white'],join(' - ',@region)); print 'x'x($max_length{environment} - array_length(\@environment)); print colored(['white on_blue'],@environment); print colored(['white on_blue'],'|'); print colored(['white on_blue'],@host); print "\n";
+        print colored(['white on_blue'], $keyword); print colored(['blue on_white'],join(' - ',@region)); print 'x'x($max_len{environment} - array_length(\@environment)); print colored(['white on_blue'],@environment); print colored(['white on_blue'],'|'); print colored(['white on_blue'],@host); print "\n";
         print array_length(\@region);
     } 
     elsif($keylength == 4){
-        print colored(['white on_blue'],@region); print ' '; print @environment; print ' '; print @host; print "\n";
+        print colored(['white on_blue'], join(' - ', @region)); print ' '; print @environment; print ' '; print @host; print "\n";
     }
 
 }

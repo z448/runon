@@ -3,24 +3,32 @@
     "application": "apaapp",
     "region": "AMER",
     "appid": "3502",
-    "env": "QA",
-    "username": "mobile",
-    "hostname": "10.0.0.34"
+    "environment": "QA",
+    "username": "zdenek",
+    "hostname": "10.0.0.132"
   },
   {
-    "hostname": "10.0.0.35 -p 2844",
+    "application": "apaapp",
+    "region": "AMER",
+    "appid": "1234",
+    "environment": "UAT",
+    "username": "zdenek",
+    "hostname": "10.0.0.135"
+  },
+  {
+    "hostname": "10.0.0.138",
     "application": "apbapp",
     "region": "EMEA",
     "appid": "3576",
     "username": "mobile",
-    "env": "UAT"
+    "environment": "UAT"
   },
   {
     "application": "apcapp",
     "region": "ASIA",
     "appid": "3502",
-    "env": "SIT",
+    "environment": "SIT",
     "username": "mobile",
-    "hostname": "10.0.0.34"
+    "hostname": "10.0.0.136"
   }
 ]
