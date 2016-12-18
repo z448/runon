@@ -77,7 +77,7 @@ sub array_length {
 
 
 
-sub relay {
+sub show {
     my $keyword = shift;
     my( @region, @environment, @host ) = ();
     my( $results, $keylength )  = filter($keyword);
@@ -90,30 +90,56 @@ sub relay {
     # has to be uniq otherwise it would display AMER - AMER if there is App only in AMER region but on more environments
     @region = uniq @region; @environment = uniq @environment; 
 
-    system("clear");
-    my $host_nr = colored([$c{select}], $#host + 1); # number of filtered hosts
+    my $term_width  = int `tput cols`;
     my $joint = colored([$c{default}],' ');
+    
+    # add host from filtered host array until it wont fit terminal. Then add number of hosts that didnt fit.
+    my $host_line = sub {
+        my $base_line_width = length(join($joint, ($$results[0]->{application}), join(' - ',@environment), join(' - ',@region)));
+        my $host_line_space = int $term_width - int $base_line_width;
+        my $host_line = '_'; my $host_line_colored = '_'; my $h = 0;
+        for( @host ){
+            if( $keylength == 5 ){ 
+                $host_line .= $h . $_;
+                $host_line_colored .= colored([$c{select}],$h) . colored([$c{default}],$_) if $host_line_space > length( (length $host_line) - 1);
+            } else { 
+                $host_line .= ' ' . $_;
+                $host_line_colored .= colored([$c{default}],' ') . colored([$c{default}],$_) if $host_line_space > length( (length $host_line) - 1);
+            }
+            $h++;
+        }
+        $host_line_colored =~ s/^_//;
+    say "term_width:$term_width";
+    say "base_line_width:$base_line_width";
+        return $host_line_colored;
+    };
+    my $host = $host_line->();
+
+    #system("clear");
+    my $host_nr = colored([$c{select}], $#host + 1); # number of filtered hosts
+
     if($keylength == 3){
         my $line = join( $joint, 
-            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{select}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)) , colored([$c{default}],join(' ',@host)), colored([$c{select}], $#host + 1) )
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{select}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)), $host, colored([$c{select}], $#host + 1) )
         );
         print $line . "\n";
     } 
 
     elsif($keylength == 4){
         my $line = join( $joint,
-            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{select}],join(' - ',@environment)) , colored([$c{default}],join(' ',@host)), colored([$c{select}], $#host + 1) )
+            ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{select}],join(' - ',@environment)) , $host, colored([$c{select}], $#host + 1) )
         );
         print $line . "\n";
     }
 
     elsif($keylength == 5){
-        # make host string adding index nr to each for selection
-        my $host = colored([$c{default}],' '); my $h = 0;
-        for( @host ){ 
-            $host .= colored([$c{select}],$h) . colored([$c{default}],$_);
-            $h++;
-        }
+        # make host string replacing space with index nr to each for selection
+        #my $host = '_'; my $h = 0;
+        #for( @host ){ 
+        #    $host .= colored([$c{select}],$h) . colored([$c{default}],$_);
+        #    $h++;
+        #}
+        #$host =~ s/^_//;
 
         my $line = join( $joint,
             ( colored([$c{default}], $$results[0]->{application}) , colored([$c{default}],join(' - ',@region)) , colored([$c{default}],join(' - ',@environment)) , $host, colored([$c{select}], $#host + 1) )
@@ -122,5 +148,5 @@ sub relay {
     }
 }
 
-relay("$ARGV[0]");
+show("$ARGV[0]");
 
