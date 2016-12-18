@@ -16,9 +16,41 @@
     "hostname": "10.0.0.135"
   },
   {
+    "application": "apaapp",
+    "region": "AMER",
+    "appid": "1234",
+    "environment": "TEST",
+    "username": "zdenek",
+    "hostname": "10.0.0.135"
+  },
+  {
+    "application": "apaapp",
+    "region": "EU",
+    "appid": "3502",
+    "environment": "QA",
+    "username": "zdenek",
+    "hostname": "10.0.0.132"
+  },
+  {
+    "application": "apaapp",
+    "region": "EU",
+    "appid": "1234",
+    "environment": "UAT",
+    "username": "zdenek",
+    "hostname": "10.0.0.135"
+  },
+  {
+    "application": "apaapp",
+    "region": "EU",
+    "appid": "1234",
+    "environment": "TEST",
+    "username": "zdenek",
+    "hostname": "10.0.0.135"
+  },
+  {
     "hostname": "10.0.0.138",
     "application": "apbapp",
-    "region": "EMEA",
+    "region": "EU",
     "appid": "3576",
     "username": "mobile",
     "environment": "UAT"
