@@ -88,23 +88,31 @@ sub show {
     my $term_width  = int `tput cols`;
     
     # add host from filtered host array until it wont fit terminal. Then add number of hosts that didnt fit.
-    my $host_line_colored = "_"; my $host_line = " ";my $h = 0;
-    my $line_width = join($joint, ($$results[0]->{application}, join(' - ',@environment), join(' - ',@region)));
+    my $host_line_colored = ' '; my $host_line; my $h = 0;
+    my $base_line = join(' ', ($$results[0]->{application}, join(' - ',@environment), join(' - ',@region), $#host));
+
     for( @host ){
-        $host_line .= "$_$h";
-        $line_width = int(length($line_width) - 1 );
-        if(($line_width + length($host_line)) < $term_width){
+        $host_line .= "$h$_\ ";
+        my $line_width = length($base_line)  + length($host_line);
+
+        say "term_width" . $term_width;
+        say "host_line:" . $host_line;
+        say "base_line:" . $base_line;
+        say "base_line length:" . length $base_line;
+        say "line_width:" . $line_width;
+
+        if($line_width <= $term_width){
             if( $keylength == 5 ){ 
                 $host_line_colored = $host_line_colored . colored([$c{select}],$h) . colored([$c{default}],$_);
             } else { 
                 $host_line_colored = $host_line_colored . colored([$c{default}],' ') . colored([$c{default}],$_);
             }
-        }
+        } 
         $h++;
     }
-    $host_line_colored =~ s/^_//;
+    $host_line_colored =~ s/^\ //;
 
-    system("clear");
+    #system("clear");
     my $host_nr = colored([$c{select}], $#host + 1); # number of filtered hosts
 
     if($keylength == 3){
