@@ -1,4 +1,31 @@
 #!/usr/bin/env perl
 
 use App::Runon;
-show("$ARGV[0]");
+use App::Runon::HotKey qw< readkey >;
+
+STDOUT->autoflush(1);
+
+
+sub mykey {
+    return sub { my $key = readkey() };
+}
+
+show($ARGV[0]);
+
+__DATA__
+# READKEY mode
+my $keys = $ARGV[0];
+show($keys);
+
+my $a = mykey();
+$keys .= $a->();
+show($keys);
+$a = mykey();
+$keys .= $a->();
+show($keys);
+
+$a = mykey();
+$keys .= $a->();
+# /READKEY mode
+
+
